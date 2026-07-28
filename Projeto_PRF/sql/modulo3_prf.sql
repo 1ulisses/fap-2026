@@ -228,3 +228,17 @@ COPY vw_acidentes_base TO 'resultados/acidentes_base.csv' (HEADER, DELIMITER ';'
 COPY vw_indicadores_mensais TO 'resultados/indicadores_mensais.csv' (HEADER, DELIMITER ';');
 COPY vw_bivariada_tipo_acidente TO 'resultados/bivariada_tipo_acidente.csv'(HEADER, DELIMITER ';');
 COPY vw_indicadores_uf_br TO 'resultados/indicadores_uf_br.csv'(HEADER, DELIMITER ';');
+-- DESAFIO
+-- n1
+SELECT dayname(CAST(data_inversa AS DATE)) AS dia_semana,
+    COUNT(*) AS total_acidentes
+FROM vw_acidentes_base
+GROUP BY dayname(CAST(data_inversa AS DATE))
+ORDER BY total_acidentes DESC;
+-- n2
+SELECT uf,
+    COUNT(*) AS total_acidentes
+FROM vw_acidentes_base
+GROUP BY uf
+ORDER BY total_acidentes DESC
+LIMIT 15;
