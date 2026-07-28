@@ -1,0 +1,17 @@
+categoria;total_acidentes;acidentes_fatais;perc_fatais;cobertura_perc;lift
+Incêndio;1771;0;0.0;2.44;0.0
+Capotamento;1373;63;4.59;1.89;0.64
+Tombamento;6351;268;4.22;8.76;0.59
+Atropelamento de Animal;1133;68;6.0;1.56;0.84
+Queda de ocupante de veículo;3450;87;2.52;4.76;0.35
+Saída de leito carroçável;10209;605;5.93;14.08;0.82
+Colisão frontal;4739;1396;29.46;6.53;4.1
+Colisão transversal;9306;427;4.59;12.83;0.64
+Colisão lateral sentido oposto;2152;212;9.85;2.97;1.37
+Engavetamento;1233;28;2.27;1.7;0.32
+Eventos atípicos;287;23;8.01;0.4;1.12
+Atropelamento de Pedestre;3057;902;29.51;4.22;4.11
+Colisão lateral mesmo sentido;7885;212;2.69;10.87;0.37
+Colisão traseira;14360;619;4.31;19.8;0.6
+Derramamento de carga;107;3;2.8;0.15;0.39
+Colisão com objeto;5109;297;5.81;7.04;0.81
