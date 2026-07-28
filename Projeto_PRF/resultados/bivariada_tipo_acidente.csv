@@ -1,17 +1,17 @@
-categoria;total_acidentes;acidentes_fatais;perc_fatais;cobertura_perc;lift
-Incêndio;1771;0;0.0;2.44;0.0
-Capotamento;1373;63;4.59;1.89;0.64
-Tombamento;6351;268;4.22;8.76;0.59
-Atropelamento de Animal;1133;68;6.0;1.56;0.84
-Queda de ocupante de veículo;3450;87;2.52;4.76;0.35
-Saída de leito carroçável;10209;605;5.93;14.08;0.82
-Colisão frontal;4739;1396;29.46;6.53;4.1
-Colisão transversal;9306;427;4.59;12.83;0.64
-Colisão lateral sentido oposto;2152;212;9.85;2.97;1.37
-Engavetamento;1233;28;2.27;1.7;0.32
-Eventos atípicos;287;23;8.01;0.4;1.12
-Atropelamento de Pedestre;3057;902;29.51;4.22;4.11
-Colisão lateral mesmo sentido;7885;212;2.69;10.87;0.37
-Colisão traseira;14360;619;4.31;19.8;0.6
-Derramamento de carga;107;3;2.8;0.15;0.39
-Colisão com objeto;5109;297;5.81;7.04;0.81
+categoria;total_acidentes;acidentes_fatais;perc_total;perc_fatais;lift
+Capotamento;1373;63;1.89;4.59;0.64
+Tombamento;6351;268;8.76;4.22;0.59
+Atropelamento de Animal;1133;68;1.56;6.0;0.84
+Eventos atï¿½picos;287;23;0.4;8.01;1.12
+Colisï¿½o traseira;14360;619;19.8;4.31;0.6
+Saï¿½da de leito carroï¿½ï¿½vel;10209;605;14.08;5.93;0.82
+Colisï¿½o lateral mesmo sentido;7885;212;10.87;2.69;0.37
+Incï¿½ndio;1771;0;2.44;0.0;0.0
+Colisï¿½o com objeto;5109;297;7.04;5.81;0.81
+Colisï¿½o transversal;9306;427;12.83;4.59;0.64
+Colisï¿½o lateral sentido oposto;2152;212;2.97;9.85;1.37
+Engavetamento;1233;28;1.7;2.27;0.32
+Atropelamento de Pedestre;3057;902;4.22;29.51;4.11
+Derramamento de carga;107;3;0.15;2.8;0.39
+Colisï¿½o frontal;4739;1396;6.53;29.46;4.1
+Queda de ocupante de veï¿½culo;3450;87;4.76;2.52;0.35
