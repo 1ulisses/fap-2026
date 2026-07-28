@@ -1,0 +1,1 @@
+CREATE OR REPLACE TABLE acidentes_prf_2025 AS SELECT * FROM read_csv_auto('dados_brutos/acidentes2025.csv', delim=';', header=true, sample_size=-1, encoding='latin-1');
