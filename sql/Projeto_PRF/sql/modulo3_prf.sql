@@ -230,15 +230,93 @@ COPY vw_bivariada_tipo_acidente TO 'resultados/bivariada_tipo_acidente.csv'(HEAD
 COPY vw_indicadores_uf_br TO 'resultados/indicadores_uf_br.csv'(HEADER, DELIMITER ';');
 -- DESAFIO
 -- n1
-SELECT dayname(CAST(data_inversa AS DATE)) AS dia_semana,
+SELECT dia_semana,
     COUNT(*) AS total_acidentes
 FROM vw_acidentes_base
-GROUP BY dayname(CAST(data_inversa AS DATE))
+GROUP BY dia_semana
 ORDER BY total_acidentes DESC;
 -- n2
-SELECT uf,
+SELECT municipio,
     COUNT(*) AS total_acidentes
 FROM vw_acidentes_base
-GROUP BY uf
+GROUP BY municipio
 ORDER BY total_acidentes DESC
 LIMIT 15;
+-- n3
+SELECT br,
+    AVG(veiculos) AS media_veiculos,
+    COUNT(*) AS total_acidentes
+FROM vw_acidentes_base
+GROUP BY br
+HAVING COUNT(*) >= 100
+ORDER BY media_veiculos DESC;
+-- n4
+SELECT uf,
+    COUNT(*) AS total_acidentes_noite
+FROM vw_acidentes_base
+WHERE fase_dia IN ('Plena Noite', 'Anoitecer')
+GROUP BY uf
+ORDER BY total_acidentes_noite DESC;
+-- n5
+SELECT tipo_pista,
+    COUNT(*) AS total_acidentes
+FROM vw_acidentes_base
+GROUP BY tipo_pista
+ORDER BY total_acidentes DESC;
+-- n6
+SELECT uf,
+    fase_dia,
+    COUNT(*) AS total_ocorrencias,
+    (SUM(acidente_fatal) * 100.0 / COUNT(*)) AS percentual_fatal
+FROM vw_acidentes_base
+GROUP BY uf,
+    fase_dia
+HAVING COUNT(*) >= 50
+ORDER BY percentual_fatal DESC;
+-- n7
+SELECT tipo_acidente,
+    AVG(pessoas) AS media_pessoas
+FROM vw_acidentes_base
+GROUP BY tipo_acidente
+ORDER BY media_pessoas DESC;
+-- n8
+SELECT causa_acidente,
+    SUM(mortos) AS total_mortos
+FROM vw_acidentes_base
+GROUP BY causa_acidente
+ORDER BY total_mortos DESC
+LIMIT 5;
+-- n9
+SELECT uso_solo,
+    COUNT(*) AS total_acidentes,
+    (SUM(acidente_fatal) * 100.0 / COUNT(*)) AS percentual_fatal
+FROM vw_acidentes_base
+GROUP BY uso_solo
+ORDER BY percentual_fatal DESC;
+-- n10
+SELECT municipio,
+    COUNT(*) AS total_acidentes_chuva
+FROM vw_acidentes_base
+WHERE condicao_metereologica = 'Chuva'
+GROUP BY municipio
+HAVING COUNT(*) >= 30
+ORDER BY total_acidentes_chuva DESC;
+-- n11
+SELECT tipo_acidente,
+    condicao_metereologica,
+    COUNT(*) AS total_ocorrencias,
+    (SUM(acidente_fatal) * 100.0 / COUNT(*)) AS percentual_fatal
+FROM vw_acidentes_base
+GROUP BY tipo_acidente,
+    condicao_metereologica
+HAVING COUNT(*) >= 50
+ORDER BY percentual_fatal DESC;
+-- n12
+SELECT uf,
+    COUNT(*) AS total_acidentes,
+    SUM(acidente_fatal) AS total_acidentes_fatais,
+    (SUM(acidente_fatal) * 100.0 / COUNT(*)) AS percentual_fatal,
+    SUM(mortos) AS total_mortos
+FROM vw_acidentes_base
+GROUP BY uf
+ORDER BY percentual_fatal DESC;
