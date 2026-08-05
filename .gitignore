@@ -1,2 +1,3 @@
+*.db
 .vscode
 sql/Projeto_PRF_SQLite/acidentes_prf_2025.db
