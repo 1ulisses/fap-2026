@@ -17,10 +17,11 @@ SELECT *
 FROM acidentes_prf_2025;
 
 -- DESAFIO 1
--- INTERPRETAÇÃO: BA e PE com maior gravidade entre os maiores.
--- Maior taxa de fatalidade embora não tenham maior número de acidentes.
--- Taxas de fatalidade acima da média nacional.
--- Possíveis problemas de infraestrutura, atendimendo, etc.
+-- OBJETIVO: Identificar UFs com mais de 1500 acidentes e percentual de fatalidade acima da média nacional.
+-- INTERPRETAÇÃO: BA (11.59%) e PE (10.02%) lideram em gravidade entre estados com alto volume, ambos
+-- significativamente acima da média nacional (7.18%). MS (8.22%), MT (7.74%) e GO (7.73%) também estão
+-- acima da média. Estados com maior volume como SP (4.38%), SC (4.57%) e RJ (4.76%) têm taxas abaixo
+-- da média, possivelmente indicando melhor infraestrutura, fiscalização ou atendimento médico.
 
 SELECT '================= DESAFIO 1 =================' AS separator;
 
@@ -63,8 +64,12 @@ FROM uf_stats
 ORDER BY pct_fatal DESC;
 
 -- DESAFIO 2
--- INTERPRETAÇÃO: 423, 242, 222 com alta letalidade sem serem as mais
--- movimentadas.
+-- OBJETIVO: Identificar BRs com alta proporção de acidentes fatais que não estão entre as top 10 em volume.
+-- INTERPRETAÇÃO: BR-423 (21.86%), BR-242 (19.08%) e BR-222 (18.24%) lideram em gravidade sem estar entre
+-- as mais movimentadas. Estas rodovias apresentam risco desproporcional: embora tenham volume moderado
+-- (entre 183 e 581 acidentes), suas taxas de fatalidade são 2.5x a 3x maiores que a média nacional (7.18%).
+-- Isso indica necessidade de atenção especial nestas vias, possivelmente por características estruturais
+-- críticas, fiscalização insuficiente ou trechos perigosos específicos.
 
 SELECT '================= DESAFIO 2 =================' AS separator;
 
@@ -102,10 +107,11 @@ ORDER BY pct_fatal DESC
 LIMIT 15;
 
 -- DESAFIO 3
--- INTERPRETAÇÃO: 00h-05h é horário mais fatal, embora onde ocorra menos
--- acidentes.
--- Possivelmente por fadiga, baixa visibilidade ou falta de resposta.
--- 12h-17h horário com menos fatalidades.
+-- OBJETIVO: Identificar faixa horária com maior proporção de acidentes fatais.
+-- INTERPRETAÇÃO: Faixa 00h-05h tem maior taxa de fatalidade (12.1%), apesar de concentrar apenas 12.28%
+-- dos acidentes. Em contraste, 12h-17h (30.75% dos acidentes) tem menor taxa (5.53%). O período noturno
+-- (18h-23h) também apresenta alta letalidade (9.13%) com grande volume (28.21%). A maior gravidade na
+-- madrugada sugere influência de fadiga, baixa visibilidade, velocidade excessiva ou demora no atendimento.
 
 SELECT '================= DESAFIO 3 =================' AS separator;
 
@@ -134,10 +140,11 @@ GROUP BY faixa_horaria
 ORDER BY pct_fatal DESC;
 
 -- DESAFIO 4
--- INTERPRETAÇÃO: Colisão traseira mais comum em dia e noite.
--- Colisão tranversal 2o mais comum ao dia e
--- Saida de leito carroçável 2o mais comum a noite.
--- Saida de leito possivelmente causado por mal visibilidade.
+-- OBJETIVO: Comparar tipos de acidente mais frequentes entre dia e noite para identificar mudança de padrão.
+-- INTERPRETAÇÃO: Colisão traseira é a mais comum em ambos períodos (Dia: 21.24%, Noite: 17.69%).
+-- Durante o dia, Colisão transversal é 2ª (14.46%). À noite, Saída de leito carroçável sobe para 2º lugar
+-- (15.31% vs 13.23% no dia), indicando maior risco de perda de controle possivelmente por baixa visibilidade
+-- e fadiga. A mudança de padrão sugere que acidentes dinâmicos são mais frequentes à noite.
 
 SELECT '================= DESAFIO 4 =================' AS separator;
 
@@ -148,7 +155,7 @@ WITH dia_noite AS (
             WHEN
                 cast(
                     extract(HOUR FROM cast(horario AS TIME)) AS INTEGER
-                ) BETWEEN 6 AND 18
+                ) BETWEEN 6 AND 17
                 THEN 'Dia (06h-18h)'
             ELSE 'Noite (18h-06h)'
         END AS periodo,
@@ -169,8 +176,11 @@ QUALIFY RANK() OVER (PARTITION BY periodo ORDER BY COUNT(*) DESC) <= 5
 ORDER BY periodo, ranking;
 
 -- DESAFIO 5
--- Neblina (51%) é 50% maior que a média nacional de fatalidade.
--- Neblina possivelmente diminui a visibilidade causando mais acidentes.
+-- INTERPRETAÇÃO: Nevoeiro/Neblina (10.85%) apresenta taxa 1.51x maior que a média nacional (7.18%),
+-- sendo a única condição com volume relevante (>500) classificada como ALTO RISCO.
+-- Isso representa um aumento de 51% em relação à média, confirmando que neblina aumenta
+-- significativamente a gravidade dos acidentes, possivelmente por reduzir visibilidade e
+-- tempo de reação dos condutores.
 
 SELECT '================= DESAFIO 5 =================' AS separator;
 
@@ -215,10 +225,11 @@ FROM clima_stats
 ORDER BY pct_fatal DESC;
 
 -- DESAFIO 6
--- INTERPRETAÇÃO: Munícios com mais acidentes e fatalidades abaixo da média são
--- Brasília(DF), Duque de Caxias(RJ) e São José(SC).
--- possivelmente indica bom atendimendo médico, baixa velocidade nos acidentes
--- ou melhor infraestrutura urbana.
+-- INTERPRETAÇÃO: Brasília (DF), Duque de Caxias (RJ) e São José (SC) lideram em volume de acidentes
+-- com fatalidade abaixo da média nacional (7.18%). Brasília tem 1011 acidentes e apenas 4.25% de
+-- fatalidade, possivelmente indicando melhor infraestrutura urbana, atendimento médico rápido ou
+-- menor velocidade média nas vias. A baixa letalidade apesar do alto volume sugere fatores
+-- protetivos como fiscalização eficiente ou características das rodovias.
 
 SELECT '================= DESAFIO 6 =================' AS separator;
 
@@ -260,8 +271,11 @@ ORDER BY total_acidentes DESC
 LIMIT 20;
 
 -- DESAFIO 7
--- INTERPRETAÇÃO: Pista simples e Reta;Ponte (16.57) é a combinação mais fatal,
--- seguida por Simples e Aclive;Reta (15.76) e Simples e Curva;Declive (14.93).
+-- INTERPRETAÇÃO: Pista Simples combinada com Reta;Ponte (16.57%) tem maior taxa de fatalidade,
+-- seguida por Simples com Aclive;Reta (15.76%) e Curva;Declive (14.93%). A combinação de pista
+-- simples com elementos que exigem maior controle do veículo (pontes, aclives, curvas) apresenta
+-- risco elevado, possivelmente devido à ausência de separação física entre fluxos opostos e
+-- menor margem de erro em situações críticas.
 
 SELECT '================= DESAFIO 7 =================' AS separator;
 
@@ -292,11 +306,11 @@ ORDER BY pct_fatal DESC
 LIMIT 15;
 
 -- DESAFIO 8
--- INTERPRETAÇÃO: Causas relacionadas a pedestres
--- possuem baixa cobertura (<1%) mais alta fatalidade:
--- "Suicídio (presumido)" (55.79%), "Pedestre andava na pista" (41.25%) e
--- "Entrada inopinada do pedestre" (30.43%)
--- Acidentes relacionados a pedestres possuem maior fatalidade
+-- INTERPRETAÇÃO: Causas relacionadas a pedestres dominam o topo: "Suicídio (presumido)" (55.79%),
+-- "Pedestre andava na pista" (41.25%) e "Entrada inopinada do pedestre" (30.43%) têm alta letalidade
+-- mas baixa cobertura (<1% cada). "Transitar na contramão" (29.74%) e "Ultrapassagem Indevida"
+-- (17.06%) também são altamente letais. Eventos raros envolvendo pedestres ou manobras críticas
+-- tendem a ser mais graves, indicando vulnerabilidade e necessidade de prevenção específica.
 
 SELECT '================= DESAFIO 8 =================' AS separator;
 
@@ -332,9 +346,11 @@ ORDER BY pct_fatal DESC
 LIMIT 15;
 
 -- DESAFIO 9
--- INTERPRETAÇÃO: Taxa de fatalidade variou entre 6.49% (Jan.) e 8.27% (Mai.)
--- tendência fraca a aumentar (6x aumentor vs 5x diminuiu)
--- Possivelmente por motivos sazonais ou eventos
+-- INTERPRETAÇÃO: A taxa de fatalidade variou entre 6.49% (janeiro) e 8.27% (maio), com tendência
+-- relativamente estável ao longo de 2025. Houve 6 aumentos e 5 diminuições mês a mês, sem padrão
+-- claro de crescimento ou queda sustentada. Maio apresentou o pico (8.27%), possivelmente associado
+-- a fatores sazonais como feriados ou condições climáticas, mas a taxa geral permaneceu próxima
+-- da média nacional de 7.18%.
 
 SELECT '================= DESAFIO 9 =================' AS separator;
 
@@ -366,12 +382,11 @@ FROM mes_stats
 ORDER BY mes;
 
 -- DESAFIO 10
--- INTERPRETAÇÃO: Tipos de acidente com maior lift são: Atropelamento(4.1),
--- Colisão frontal(4.1) e Colisão lateral sentido oposto(1.37)
--- Tipos com menor lift são: Incêndio(0.0), Engavetamento(0.31) e
--- Queda de ocupante do veículo(0.35).
--- Acidentes envolvendo pedestres e acidentes violentos são mais fatais que
--- o contrário.
+-- INTERPRETAÇÃO: "Atropelamento de Pedestre" (Lift=4.1) e "Colisão frontal" (Lift=4.1) têm maior
+-- risco relativo, sendo mais de 4 vezes mais letais que a média global (7.183%). "Colisão lateral
+-- sentido oposto" (Lift=1.37) também está acima da média. Tipos com menor lift: "Incêndio" (0.0),
+-- "Engavetamento" (0.32) e "Queda de ocupante" (0.35). Acidentes envolvendo pedestres ou impacto
+-- frontal direto são desproporcionalmente mais graves, indicando alta vulnerabilidade nesses cenários.
 
 SELECT '================= DESAFIO 10 =================' AS separator;
 
@@ -420,11 +435,11 @@ FROM tipo_stats
 ORDER BY lift DESC;
 
 -- DESAFIO 11
--- INTERPRETAÇÃO: Amanhecer, Simples e Céu Claro(15.69%),
--- Plena noite, Simples, Ignorado(13.61%) e Céu claro(13.45%)
--- são as 3 combinações mais fatais.
--- Plena noite, Simples e Céu claro possui maior volume 11.52%.
--- Plena noite domina ranking possivelmente devido a baixa visibilidade e fadiga
+-- INTERPRETAÇÃO: "Amanhecer + Pista Simples + Céu Claro" (15.69%) tem maior taxa de fatalidade,
+-- seguido por "Plena Noite + Simples + Ignorado" (13.61%) e "Plena Noite + Simples + Céu Claro"
+-- (13.45%). Este último também tem maior volume (19.71% da base). Perfis noturnos e de amanhecer
+-- em pista simples dominam o ranking, sugerindo que baixa luminosidade combinada com infraestrutura
+-- mais vulnerável aumenta significativamente o risco de fatalidade.
 
 SELECT '================= DESAFIO 11 =================' AS separator;
 
@@ -460,12 +475,13 @@ ORDER BY pct_fatal DESC
 LIMIT 10;
 
 -- DESAFIO 12
--- HIPÓTESE: Acidentes a noite em pistas simples são mais fatais que outras
--- combinações, devido a baixa visibilidade, separação física das ruas e fadiga
--- do condutor, possivelmente após a jornada de trabalho.
--- RESULTADO: Noite e Pista simples possui 14564 acidentes e 1899 fatais com 13%
--- de porcentagem de fatalidade.
--- CONCLUSÃO: Confirmado
+-- HIPÓTESE: "Acidentes noturnos em pista simples são mais letais que outras combinações, devido à
+-- baixa visibilidade, ausência de separação física entre fluxos opostos e possível fadiga dos
+-- condutores após jornada de trabalho."
+-- RESULTADO: Grupo "Noite_Pista_Simples" tem 14.564 acidentes com 13.04% de fatalidade, enquanto
+-- "Outros" têm 57.965 acidentes com 5.71% de fatalidade. O grupo da hipótese é 2.28x mais letal.
+-- CONCLUSÃO: CONFIRMADA - Acidentes noturnos em pista simples apresentam taxa de fatalidade
+-- significativamente maior (13.04% vs 5.71%), validando a hipótese de maior risco neste contexto.
 
 SELECT '================= DESAFIO 12 =================' AS separator;
 
