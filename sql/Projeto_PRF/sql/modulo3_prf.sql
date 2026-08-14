@@ -249,6 +249,31 @@ GROUP BY
     g.taxa_global
 HAVING count(*) >= 100;
 -- Exportar
+COPY (
+SELECT
+data_inversa, dia_semana,
+horario, uf, br, municipio,
+causa_acidente, tipo_acidente,
+classificacao_acidente,
+fase_dia,
+condicao_metereologica,
+tipo_pista, tracado_via,
+uso_solo, mortos, acidente_fatal
+FROM vw_acidentes_base)
+TO 'resultados/base_analitica_sql.csv'(HEADER, DELIMITER ';');
+COPY (
+SELECT
+uf, br, municipio,
+EXTRACT(MONTH FROM
+CAST(data_inversa AS DATE)) AS mes,
+dia_semana, fase_dia,
+causa_acidente, tipo_acidente,
+condicao_metereologica,
+tipo_pista, tracado_via,
+uso_solo, acidente_fatal
+FROM vw_acidentes_base)
+TO 'resultados/base_modelavel_preliminar_sql.csv'
+(HEADER, DELIMITER ';'); 
 COPY vw_acidentes_base TO 'resultados/acidentes_base.csv' (HEADER,
 DELIMITER ';');
 COPY vw_indicadores_mensais TO 'resultados/indicadores_mensais.csv' (HEADER,
