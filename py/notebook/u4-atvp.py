@@ -198,6 +198,25 @@ def fatal_rate_per_category(base, coluna, min_registros=30):
 
 
 display(fatal_rate_per_category(df, "tipo_acidente", min_registros=30).head(10))
+# %%
+banned_vars = [
+    "mortos",
+    "feridos",
+    "feridos_leves",
+    "feridos_graves",
+    "total_vitimas",
+    "indice_gravidade",
+    "acidente_grave",
+    "classificacao_acidente",
+]
+
+
+def check_data_leakage(base, proibidas):
+    presentes = [c for c in proibidas if c in base.columns]
+    if presentes:
+        raise ValueError(f"Data leakage: {presentes}")
+    return "OK — nenhuma variável proibida."
+
 
 # %%
 violations = df[
