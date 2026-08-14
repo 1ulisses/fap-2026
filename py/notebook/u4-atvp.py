@@ -122,18 +122,9 @@ for col in existing_num_cols:
 
 df[existing_num_cols].dtypes
 
+
 # %%
 # Novas variáveis
-df["data_inversa"] = pd.to_datetime(df["data_inversa"], errors="coerce")
-df["ano"] = df["data_inversa"].dt.year
-df["mes"] = df["data_inversa"].dt.month
-df["trimestre"] = df["data_inversa"].dt.quarter
-df["dia_semana_num"] = df["data_inversa"].dt.dayofweek
-df["fim_de_semana"] = df["dia_semana_num"].isin([5, 6]).astype(int)
-horario_limpo = df["horario"].astype(str).str.strip()
-df["hora"] = pd.to_datetime(horario_limpo, format="%H:%M:%S", errors="coerce").dt.hour
-
-
 def classificar_turno(hora):
     if pd.isna(hora):
         return "IGNORADO"
@@ -146,14 +137,67 @@ def classificar_turno(hora):
     return "NOITE"
 
 
+df["data_inversa"] = pd.to_datetime(df["data_inversa"], errors="coerce")
+df["ano"] = df["data_inversa"].dt.year
+df["mes"] = df["data_inversa"].dt.month
+df["trimestre"] = df["data_inversa"].dt.quarter
+df["dia_semana_num"] = df["data_inversa"].dt.dayofweek
+df["fim_de_semana"] = df["dia_semana_num"].isin([5, 6]).astype(int)
+horario_limpo = df["horario"].astype(str).str.strip()
+df["hora"] = pd.to_datetime(horario_limpo, format="%H:%M:%S", errors="coerce").dt.hour
 df["turno"] = df["hora"].apply(classificar_turno)
+df["total_vitimas"] = df["mortos"] + df["feridos_leves"] + df["feridos_graves"]
+df["acidente_grave"] = np.where((df["mortos"] > 0) | (df["feridos_graves"] > 0), 1, 0)
+df["indice_gravidade"] = (
+    df["mortos"] * 3 + df["feridos_graves"] * 2 + df["feridos_leves"]
+) / df["pessoas"]
+
 
 # %%
-df["acidente_fatal"] = np.where(df["mortos"] >= 1, 1, 0)
-df["acidente_fatal"].value_counts()
+def formatar_br(valor):
+    if pd.isna(valor) or valor == 0:
+        return "BR-IGNORADA"
+    return f"BR-{int(valor):03d}"
+
+
+df["br_formatada"] = df["br"].apply(formatar_br)
+df["chave_localidade"] = (
+    df["uf"].astype(str)
+    + "_"
+    + df["municipio"].astype(str)
+    + "_"
+    + df["br_formatada"].astype(str)
+)
+display(df[["uf", "municipio", "br", "br_formatada", "chave_localidade"]].head())
 
 # %%
-df["acidente_fatal"].value_counts(normalize=True) * 100
+check = {
+    "linhas": len(df),
+    "colunas": df.shape[1],
+    "acidentes_fatais": int(df["acidente_fatal"].sum()),
+    "taxa_fatalidade": float(df["acidente_fatal"].mean()),
+    "total_mortos": int(df["mortos"].sum()),
+}
+
+check
+
+
+# %%
+def fatal_rate_per_category(base, coluna, min_registros=30):
+    tab = (
+        base.groupby(coluna)
+        .agg(
+            qtd_acidentes=("acidente_fatal", "size"),
+            qtd_fatais=("acidente_fatal", "sum"),
+            taxa_fatal=("acidente_fatal", "mean"),
+        )
+        .reset_index()
+    )
+    tab = tab[tab["qtd_acidentes"] >= min_registros]
+    return tab.sort_values("taxa_fatal", ascending=False)
+
+
+display(fatal_rate_per_category(df, "tipo_acidente", min_registros=30).head(10))
 
 # %%
 violations = df[
@@ -163,3 +207,28 @@ violations = df[
 
 # %%
 assert len(violations) == 0
+
+# %%
+important = [
+    "uf",
+    "municipio",
+    "causa_acidente",
+    "tipo_acidente",
+    "fase_dia",
+    "condicao_metereologica",
+    "tipo_pista",
+    "tracado_via",
+    "uso_solo",
+    "classificacao_acidente",
+    "dia_semana",
+]
+for coluna in important:
+    if coluna in df.columns:
+        df[coluna] = df[coluna].fillna("IGNORADO")
+print(df[important].isna().sum().sort_values(ascending=False))
+# %%
+df["acidente_fatal"] = np.where(df["mortos"] >= 1, 1, 0)
+df["acidente_fatal"].value_counts()
+
+# %%
+df["acidente_fatal"].value_counts(normalize=True) * 100
