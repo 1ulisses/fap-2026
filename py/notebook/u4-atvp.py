@@ -12,23 +12,23 @@
 
 # %% [markdown]
 # ### 2. Importação das bibliotecas
-import unicodedata
-from pathlib import Path
-
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
+# import unicodedata
+# from pathlib import Path
+#
+# import matplotlib.pyplot as plt
+# import numpy as np
+# import pandas as pd
 
 # %% [markdown]
 # ### 3. Leitura dos dados
-ROOT = Path(".")
-DIRS = ["data"]
-
-for directory in DIRS:
-    (ROOT / directory).mkdir(parents=True, exist_ok=True)
-
-RAW_FILE = Path("data/acidentes2025.csv")
-df = pd.read_csv(RAW_FILE, sep=";", encoding="latin1", low_memory=False)
+# ROOT = Path(".")
+# DIRS = ["data"]
+#
+# for directory in DIRS:
+#     (ROOT / directory).mkdir(parents=True, exist_ok=True)
+#
+# RAW_FILE = Path("data/acidentes2025.csv")
+# df = pd.read_csv(RAW_FILE, sep=";", encoding="latin1", low_memory=False)
 
 # %%
 df.head(5)
