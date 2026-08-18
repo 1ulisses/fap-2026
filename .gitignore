@@ -5,58 +5,23 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
-env/
+*.so
+*.egg-info/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Virtual environments
 venv/
 .venv/
-.ENV
-.python-version
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
+env/
+.ENV/
+
+# Logs
 *.log
-*.pot
-*.pyc
-*.pyo
-*.pyd
-.MF
-.TemporaryItems
-.trash
-# Virtual Environment
-venv/
-ENV/
-.venv/
-env/
-.env
-# Jupyter Notebook
-.ipynb_checkpoints
+
 # OS generated files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-# Testing
-.pytest_cache/
-.mypy_cache/
-coverage/
-htmlcov/
-.coverage
-# Distribution / packaging
-dist/
-build/
-*.egg-info/
-*.egg
 ```
