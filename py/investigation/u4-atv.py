@@ -463,7 +463,7 @@ print(clima_analysis_filtered.to_string(index=False))
 # %% [markdown]
 # **Interpretação e Conclusão:**
 #
-# Nevoeiro/Neblina(10.85%), Vento(9.90%) e Céu claro(8.65%) possuem respectivamente as maiores taxas de fatalidade.
+# Nevoeiro/Neblina (10.85%), Vento (9.90%) e Céu claro (8.65%) possuem respectivamente as maiores taxas de fatalidade.
 # Associação: Quando duas variáveis variam juntas.
 # Causalidade: Quando uma variável causa outra.
 # Esta análise não permite afirmar que determinada condição climática causa acidentes mais fatais. Podemos apenas observar uma associação estatística. Outras explicações possíveis:

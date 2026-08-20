@@ -1,8 +1,6 @@
 # %%
-import unicodedata
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -39,22 +37,21 @@ mes_analysis = (
 )
 
 mes_analysis = mes_analysis.sort_values("total_acidentes", ascending=False)
-mes_analysis["mes_nome_abrev"] = mes_analysis["mes"].map(
-    {
-        1: "Jan",
-        2: "Fev",
-        3: "Mar",
-        4: "Abr",
-        5: "Mai",
-        6: "Jun",
-        7: "Jul",
-        8: "Ago",
-        9: "Set",
-        10: "Out",
-        11: "Nov",
-        12: "Dez",
-    }
-)
+mes_map = {
+    1: "Jan",
+    2: "Fev",
+    3: "Mar",
+    4: "Abr",
+    5: "Mai",
+    6: "Jun",
+    7: "Jul",
+    8: "Ago",
+    9: "Set",
+    10: "Out",
+    11: "Nov",
+    12: "Dez",
+}
+mes_analysis["mes_nome_abrev"] = mes_analysis["mes"].map(mes_map.get)
 
 print(mes_analysis.to_string(index=False))
 
@@ -76,9 +73,8 @@ dia_analysis = (
     .reset_index()
 )
 
-dia_analysis["tipo_dia"] = dia_analysis["dia_util"].map(
-    {0: "Fim de Semana", 1: "Dia Útil"}
-)
+dia_map = {0: "Fim de Semana", 1: "Dia Útil"}
+dia_analysis["tipo_dia"] = dia_analysis["dia_util"].map(dia_map.get)
 dia_analysis = dia_analysis[
     ["tipo_dia", "total_acidentes", "acidentes_fatais", "taxa_fatalidade_pct"]
 ]
@@ -256,20 +252,20 @@ print(tipo_condicao_analysis.to_string(index=False))
 
 # %% [markdown]
 # ---
-# ## Questão 7: Quem está associado aos acidentes mais graves?
+# ## Questão 6: Quem está associado aos acidentes mais graves?
 #
 # O aumento da quantidade de veículos ou pessoas envolvidas parece estar associado a uma maior gravidade dos acidentes?
 
 
 # %%
 def def_faixa_pessoas(pessoas):
-    if pd.isna(pessoas):
+    if pd.isna(pessoas) or pessoas < 1:
         return "Ignorado"
-    if 1 <= pessoas < 4:
+    elif pessoas < 4:
         return "1-3 Pessoas"
-    elif 4 <= pessoas < 7:
+    elif pessoas < 7:
         return "4-6 Pessoas"
-    elif 7 <= pessoas < 11:
+    elif pessoas < 11:
         return "7-10 Pessoas"
     else:
         return "+10 Pessoas"
@@ -286,7 +282,30 @@ faixa_pessoas_analysis = (
     )
     .reset_index()
 )
+
 faixa_pessoas_analysis = faixa_pessoas_analysis.sort_values(
     "total_acidentes", ascending=False
 )
+
 print(faixa_pessoas_analysis.to_string(index=False))
+
+# %% [markdown]
+# ---
+# ## Questão 7: Três gráficos e uma história
+#
+# UF
+# Qual história os três gráficos contam quando analisados em conjunto?
+
+uf_analysis = (
+    df.groupby("uf")
+    .agg(
+        total_acidentes=("acidente_fatal", "count"),
+        acidentes_fatais=("acidente_fatal", "sum"),
+        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
+    )
+    .reset_index()
+)
+
+uf_analysis = uf_analysis.sort_values("total_acidentes", ascending=False)
+
+print(uf_analysis.to_string(index=False))
