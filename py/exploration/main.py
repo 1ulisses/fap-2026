@@ -1,6 +1,7 @@
 # %%
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -14,6 +15,19 @@ for directory in DIRS:
 ANALYTICAL_FILE = Path("./data/acidentes2025_analitica.csv")
 df = pd.read_csv(ANALYTICAL_FILE, sep=";", encoding="latin1", low_memory=False)
 
+
+def analyze(df, col):
+    return (
+        df.groupby(col)
+        .agg(
+            total_acidentes=("acidente_fatal", "count"),
+            acidentes_fatais=("acidente_fatal", "sum"),
+            taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
+        )
+        .reset_index()
+    )
+
+
 # %% [markdown]
 # ---
 # ## Questão 1: Quando os acidentes acontecem?
@@ -26,15 +40,7 @@ df["data_inversa"] = pd.to_datetime(df["data_inversa"], errors="coerce")
 df["mes"] = df["data_inversa"].dt.month
 df["mes_nome"] = df["data_inversa"].dt.month_name()
 
-mes_analysis = (
-    df.groupby("mes")
-    .agg(
-        total_acidentes=("acidente_fatal", "count"),
-        acidentes_fatais=("acidente_fatal", "sum"),
-        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
-    )
-    .reset_index()
-)
+mes_analysis = analyze(df, "mes")
 
 mes_analysis = mes_analysis.sort_values("total_acidentes", ascending=False)
 mes_map = {
@@ -63,15 +69,7 @@ df["dia_util"] = df["dia_semana"].apply(
         else 1
     )
 )
-dia_analysis = (
-    df.groupby("dia_util")
-    .agg(
-        total_acidentes=("acidente_fatal", "count"),
-        acidentes_fatais=("acidente_fatal", "sum"),
-        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
-    )
-    .reset_index()
-)
+dia_analysis = analyze(df, "dia_util")
 
 dia_map = {0: "Fim de Semana", 1: "Dia Útil"}
 dia_analysis["tipo_dia"] = dia_analysis["dia_util"].map(dia_map.get)
@@ -82,15 +80,7 @@ dia_analysis = dia_analysis.set_index("tipo_dia")
 
 print(dia_analysis.to_string())
 # %%
-dia_semana_analysis = (
-    df.groupby("dia_semana")
-    .agg(
-        total_acidentes=("acidente_fatal", "count"),
-        acidentes_fatais=("acidente_fatal", "sum"),
-        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
-    )
-    .reset_index()
-)
+dia_semana_analysis = analyze(df, "dia_semana")
 dia_semana_analysis = dia_semana_analysis.sort_values(
     "total_acidentes", ascending=False
 )
@@ -111,20 +101,22 @@ print(dia_semana_analysis.to_string())
 # O tipo de acidente mais frequente também é aquele com maior proporção de acidentes fatais?
 
 # %%
-tipo_analysis = (
-    df.groupby("tipo_acidente")
-    .agg(
-        total_acidentes=("acidente_fatal", "count"),
-        acidentes_fatais=("acidente_fatal", "sum"),
-        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
-    )
-    .reset_index()
-)
+tipo_analysis = analyze(df, "tipo_acidente")
+uf_analysis = analisar_acidentes(df, "uf")
 
-# Filtrar tipos com pelo menos 50 ocorrências
-tipo_analysis = tipo_analysis.sort_values("total_acidentes", ascending=False).head(5)
+uf_analysis = uf_analysis.sort_values("total_acidentes", ascending=False)
 
-print(tipo_analysis.to_string(index=False))
+print(uf_analysis.to_string(index=False))
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 5))
+plt.bar(uf_analysis["uf"], uf_analysis["total_acidentes"])
+plt.xlabel("UF")
+plt.ylabel("Total de Acidentes")
+plt.title("Total de Acidentes por UF")
+plt.tight_layout()
+plt.show()
 
 # %% [markdown]
 # ---
@@ -170,41 +162,17 @@ def definir_turno(fase_dia):
 df["turno"] = df["fase_dia"].apply(definir_turno)
 
 # %%
-hora_analysis = (
-    df.groupby("hora")
-    .agg(
-        total_acidentes=("acidente_fatal", "count"),
-        acidentes_fatais=("acidente_fatal", "sum"),
-        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
-    )
-    .reset_index()
-)
+hora_analysis = analyze(df, "hora")
 hora_analysis = hora_analysis.sort_values("total_acidentes", ascending=False)
 print(hora_analysis.to_string(index=False))
 
 # %%
-turno_analysis = (
-    df.groupby("turno")
-    .agg(
-        total_acidentes=("acidente_fatal", "count"),
-        acidentes_fatais=("acidente_fatal", "sum"),
-        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
-    )
-    .reset_index()
-)
+turno_analysis = analyze(df, "turno")
 turno_analysis = turno_analysis.sort_values("total_acidentes", ascending=False)
 print(turno_analysis.to_string(index=False))
 
 # %%
-faixa_analysis = (
-    df.groupby("faixa_horaria")
-    .agg(
-        total_acidentes=("acidente_fatal", "count"),
-        acidentes_fatais=("acidente_fatal", "sum"),
-        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
-    )
-    .reset_index()
-)
+faixa_analysis = analyze(df, "faixa_horaria")
 
 faixa_analysis = faixa_analysis.sort_values("total_acidentes", ascending=False)
 print(faixa_analysis.to_string(index=False))
@@ -216,15 +184,7 @@ print(faixa_analysis.to_string(index=False))
 # Os estados que concentram mais acidentes são os mesmos que apresentam maior proporção de acidentes fatais?
 
 # %%
-uf_analysis = (
-    df.groupby("uf")
-    .agg(
-        total_acidentes=("acidente_fatal", "count"),
-        acidentes_fatais=("acidente_fatal", "sum"),
-        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
-    )
-    .reset_index()
-)
+uf_analysis = analyze(df, "uf")
 
 uf_analysis = uf_analysis.sort_values("total_acidentes", ascending=False)
 print(uf_analysis.to_string(index=False))
@@ -235,15 +195,7 @@ print(uf_analysis.to_string(index=False))
 #
 # tipo_pista x condicao_metereologica
 
-tipo_condicao_analysis = (
-    df.groupby(["tipo_pista", "condicao_metereologica"])
-    .agg(
-        total_acidentes=("acidente_fatal", "count"),
-        acidentes_fatais=("acidente_fatal", "sum"),
-        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
-    )
-    .reset_index()
-)
+tipo_condicao_analysis = analyze(df, ["tipo_pista", "condicao_metereologica"])
 
 tipo_condicao_analysis = tipo_condicao_analysis.sort_values(
     "total_acidentes", ascending=False
@@ -273,15 +225,7 @@ def def_faixa_pessoas(pessoas):
 
 df["faixa_pessoas"] = df["pessoas"].apply(def_faixa_pessoas)
 
-faixa_pessoas_analysis = (
-    df.groupby("faixa_pessoas")
-    .agg(
-        total_acidentes=("acidente_fatal", "count"),
-        acidentes_fatais=("acidente_fatal", "sum"),
-        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
-    )
-    .reset_index()
-)
+faixa_pessoas_analysis = analyze(df, "faixa_pessoas")
 
 faixa_pessoas_analysis = faixa_pessoas_analysis.sort_values(
     "total_acidentes", ascending=False
@@ -296,16 +240,26 @@ print(faixa_pessoas_analysis.to_string(index=False))
 # UF
 # Qual história os três gráficos contam quando analisados em conjunto?
 
+# %%
+uf_analysis = analyze(df, "uf")
 uf_analysis = (
-    df.groupby("uf")
-    .agg(
-        total_acidentes=("acidente_fatal", "count"),
-        acidentes_fatais=("acidente_fatal", "sum"),
-        taxa_fatalidade_pct=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
-    )
-    .reset_index()
+    uf_analysis.sort_values("total_acidentes", ascending=False)
+    .head(10)
+    .reset_index(drop=True)
 )
 
-uf_analysis = uf_analysis.sort_values("total_acidentes", ascending=False)
+plt.figure(figsize=(10, 5))
+plt.bar(uf_analysis["uf"], uf_analysis["total_acidentes"], color="skyblue")
+plt.xlabel("UF")
+plt.ylabel("Total de Acidentes")
+plt.title("Total de Acidentes por UF")
+plt.tight_layout()
+plt.show()
 
-print(uf_analysis.to_string(index=False))
+# %%
+uf_condicao_analysis = analyze(df, ["uf", "condicao_metereologica"])
+uf_condicao_analysis = (
+    uf_condicao_analysis.sort_values("total_acidentes", ascending=False)
+    .head(10)
+    .reset_index(drop=True)
+)
