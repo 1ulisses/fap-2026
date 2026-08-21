@@ -102,21 +102,15 @@ print(dia_semana_analysis.to_string())
 
 # %%
 tipo_analysis = analyze(df, "tipo_acidente")
-uf_analysis = analisar_acidentes(df, "uf")
+tipo_analysis = tipo_analysis.sort_values("total_acidentes", ascending=False).head(5)
 
-uf_analysis = uf_analysis.sort_values("total_acidentes", ascending=False)
+print(tipo_analysis.to_string(index=False))
 
-print(uf_analysis.to_string(index=False))
-
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(10, 5))
-plt.bar(uf_analysis["uf"], uf_analysis["total_acidentes"])
-plt.xlabel("UF")
-plt.ylabel("Total de Acidentes")
-plt.title("Total de Acidentes por UF")
-plt.tight_layout()
-plt.show()
+# %% [markdown]
+# **Interpretação e Conclusão:**
+#
+# Não. O tipo de acidente mais frequente é Colisão traseira (14.360 casos), mas ele possui uma taxa de fatalidade de 4,31%.
+# Frequência e letalidade são dimensões distintas na segurança viária. Colisões traseiras ocorrem em grande volume (geralmente ligadas a trânsito intenso, baixa velocidade relativa ou distração), mas tendem a ser menos letais por ocorrência.
 
 # %% [markdown]
 # ---
@@ -176,6 +170,12 @@ faixa_analysis = analyze(df, "faixa_horaria")
 
 faixa_analysis = faixa_analysis.sort_values("total_acidentes", ascending=False)
 print(faixa_analysis.to_string(index=False))
+# %% [markdown]
+# **Interpretação e Conclusão:**
+#
+# Não. O horário com maior número absoluto de acidentes é às 18h (5.398 acidentes), mas sua taxa de fatalidade é de 7,04%. A maior taxa de fatalidade ocorre às 3h da manhã, com 13,70% (quase o dobro).
+# Turno: O Dia concentra mais acidentes (40.375), mas a Noite é muito mais letal (9,83%).
+# Faixa Horária: A Tarde lidera em volume (22.302), mas a Madrugada possui a maior taxa de fatalidade (12,10%).
 
 # %% [markdown]
 # ---
@@ -188,6 +188,25 @@ uf_analysis = analyze(df, "uf")
 
 uf_analysis = uf_analysis.sort_values("total_acidentes", ascending=False)
 print(uf_analysis.to_string(index=False))
+# %% [markdown]
+# **Interpretação e Conclusão:**
+#
+# Não.
+# Os estados que concentram o maior volume absoluto de acidentes (Sul e Sudeste) não são os mesmos que apresentam a maior proporção de acidentes fatais.
+# Os estados com as maiores taxas de letalidade estão localizados principalmente nas regiões Norte e Nordeste, que possuem volumes totais de acidentes muito menores.
+#
+# Minas Gerais (MG):
+# Dados: 9.570 acidentes (1º lugar) e taxa de fatalidade de 6,76%.
+# Análise: MG possui a maior malha rodoviária federal do país e um tráfego intenso. O alto volume de acidentes reflete a quantidade de veículos nas estradas.
+#
+# Santa Catarina (SC):
+# Dados: 8.186 acidentes (2º lugar) e taxa de fatalidade de 4,57%.
+# Análise: SC tem um volume muito alto de acidentes, mas a taxa de fatalidade é uma das mais baixas entre os principais estados.
+# Isso pode indicar que a maioria dos acidentes em SC são colisões de menor gravidade (como engarrafamentos ou colisões traseiras).
+#
+# Pará (PA) - Baixo volume, altíssima letalidade:
+# Dados PA: 1.117 acidentes e taxa de fatalidade de 17,28% (2º lugar).
+# Análise: Este estado têm volume de acidentes muito baixo (cerca de 1/8 do volume de MG), mas as taxas de fatalidade são alarmantes (quase 3 vezes maiores que a média nacional).
 
 # %% [markdown]
 # ---
@@ -201,6 +220,31 @@ tipo_condicao_analysis = tipo_condicao_analysis.sort_values(
     "total_acidentes", ascending=False
 )
 print(tipo_condicao_analysis.to_string(index=False))
+
+# %% [markdown]
+# **Interpretação e Conclusão:**
+#
+# Independentemente da condição meteorológica, acidentes em pista simples apresentam taxa de fatalidade muito maior do que acidentes em pista dupla ou múltipla.
+# A maior parte dos acidentes ocorre em condições boas ou normais, como céu claro.
+# Mesmo em condições boas, a taxa de fatalidade é alta em pista simples.
+# Pistas duplas e múltiplas apresentam taxas de fatalidade menores na maioria das condições meteorológicas.
+# Condições como nevoeiro/neblina aumentam a taxa de fatalidade.
+#
+# Uma possível explicação é que pistas simples concentram mais situações de conflito grave, como:
+# colisões frontais;
+# ultrapassagens mal executadas;
+# tráfego em sentidos opostos sem separação física;
+#
+# Já pistas duplas ou múltiplas tendem a ter:
+# separação física dos sentidos;
+# menor chance de colisão frontal;
+# maior capacidade de tráfego;
+#
+# Não é possível afirmar causalidade apenas com essa análise porque os dados são observacionais e agregados.
+# Existem várias variáveis de confusão que podem influenciar o resultado, como:
+# volume real de tráfego por tipo de pista;
+# velocidade média dos veículos;
+# qualidade do pavimento;
 
 # %% [markdown]
 # ---
@@ -232,6 +276,20 @@ faixa_pessoas_analysis = faixa_pessoas_analysis.sort_values(
 )
 
 print(faixa_pessoas_analysis.to_string(index=False))
+
+# %% [markdown]
+# **Interpretação e Conclusão:**
+#
+# Sim.
+# 1-3 Pessoas: Taxa de fatalidade de 5,98% (representa a esmagadora maioria dos acidentes, tipicamente envolvendo um ou dois veículos de passeio).
+# 4-6 Pessoas: A taxa dobra para 11,97%.
+# 7-10 Pessoas: A taxa sobe para 16,69%.
+# +10 Pessoas: A taxa atinge 24,31%, sendo mais de quatro vezes maior que a da primeira faixa.
+#
+# O aumento na gravidade não é causado pelo número de pessoas em si, mas pelo tipo de evento necessário para envolver tantas pessoas. Acidentes com muitas pessoas geralmente indicam:
+# Envolvimento de transporte coletivo ou fretamento;
+# Acidentes de grande magnitude: Engavetamentos, capotamentos de veículos grandes;
+# Viés estatístico: Quanto mais ocupantes em um único veículo sinistrado, maior a probabilidade matemática de que pelo menos uma vítima fatal seja registrada.
 
 # %% [markdown]
 # ---
@@ -283,4 +341,95 @@ plt.xlabel("UF")
 plt.ylabel("Taxa de fatalidade")
 plt.title("Taxa de fatalidade por UF")
 plt.tight_layout()
+plt.show()
+
+# %% [markdown]
+# **Interpretação e Conclusão:**
+#
+# Analisado as UFs que ocorreram os acidentes e suas condições meteorológicas.
+# MG, SC e PR possuem a maior qtd. de acidentes.
+# Estados com a menor qtd de acidentes possuem a maioria dos acidentes ocorridos em céu claro.
+# MG, SC e PR possuem um maior percentual de acidentes com condição meteorológica de chuva ou neblina.
+# MA, PA e RR, estados com a maior taxa de fatalidade, possuem a grande maioria de seus acidentes ocorridos em céu claro e possuem menor qtd. de acidentes sob chuva ou neblina.
+#
+# Sul e Sudeste concentram maior volume de acidentes, muitas vezes associados a tráfego intenso e condições meteorológicas adversas, mas com menor taxa de fatalidade.
+# Já alguns estados do Norte e Nordeste têm menos acidentes, porém acidentes muito mais fatais, mesmo ocorrendo majoritariamente em céu claro.
+# MG, SC e PR têm muitos acidentes, mas possivelmente com menor letalidade média, talvez por:
+# mais trechos duplicados;
+# maior presença de socorro;
+# mais fiscalização;
+#
+# MA, PA e RR têm menos acidentes, mas acidentes mais graves, possivelmente por:
+# mais pistas simples;
+# longos trechos isolados;
+# maior velocidade média em trechos vazios;
+
+# %% [markdown]
+# ---
+# ## Questão 8: A descoberta do grupo
+#
+# condicao_metereologica X total_acidentes X taxa_fatalidade_pct
+# 1. Pergunta
+# Acidentes sob chuva ou neblina são proporcionalmente mais fatais do que em condições normais?
+# 2. Hipótese
+# Esperava-se maior taxa de fatalidade em chuva, neblina ou pista molhada, por causa da redução de visibilidade e aderência.
+# 5. Conclusão
+# Não, possuem menor taxa de fatalidade que em condições normais.
+# 6. Limitação
+# A variável meteorológica é ampla e não captura intensidade da chuva, visibilidade real ou condição da pista no momento exato do acidente.
+
+# %%
+condicao_analysis = analyze(df, "condicao_metereologica")
+condicao_analysis = condicao_analysis.sort_values("total_acidentes", ascending=False)
+
+# 3. Análise
+print(condicao_analysis.to_string(index=False))
+
+fig, ax1 = plt.subplots(figsize=(12, 6))
+
+color_bar = "steelblue"
+ax1.set_xlabel("Condição Meteorológica", fontsize=11)
+ax1.set_ylabel("Total de Acidentes", color=color_bar, fontsize=11)
+ax1.bar(
+    condicao_analysis["condicao_metereologica"],
+    condicao_analysis["total_acidentes"],
+    color=color_bar,
+    alpha=0.8,
+)
+ax1.tick_params(axis="y", labelcolor=color_bar)
+ax1.tick_params(axis="x", rotation=45, labelbottom=True)
+
+ax2 = ax1.twinx()
+color_line = "crimson"
+ax2.set_ylabel("Taxa de Fatalidade (%)", color=color_line, fontsize=11)
+ax2.plot(
+    condicao_analysis["condicao_metereologica"],
+    condicao_analysis["taxa_fatalidade_pct"],
+    color=color_line,
+    marker="o",
+    linewidth=2.5,
+    markersize=8,
+)
+ax2.tick_params(axis="y", labelcolor=color_line)
+
+for i, v in enumerate(condicao_analysis["taxa_fatalidade_pct"]):
+    ax2.text(
+        i,
+        v + 0.3,
+        f"{v}%",
+        ha="center",
+        va="bottom",
+        color=color_line,
+        fontweight="bold",
+        fontsize=10,
+    )
+
+plt.title(
+    "Volume de Acidentes vs. Taxa de Fatalidade por Condição Meteorológica",
+    fontsize=13,
+    fontweight="bold",
+    pad=15,
+)
+fig.tight_layout()
+# 4. Evidência
 plt.show()
