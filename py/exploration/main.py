@@ -258,8 +258,29 @@ plt.show()
 
 # %%
 uf_condicao_analysis = analyze(df, ["uf", "condicao_metereologica"])
-uf_condicao_analysis = (
-    uf_condicao_analysis.sort_values("total_acidentes", ascending=False)
-    .head(10)
-    .reset_index(drop=True)
-)
+uf_condicao_analysis = uf_condicao_analysis.sort_values(
+    "total_acidentes", ascending=False
+).reset_index(drop=True)
+
+uf_pivot = uf_condicao_analysis.pivot(
+    index="uf", columns="condicao_metereologica", values="total_acidentes"
+).fillna(0)
+
+plt.figure(figsize=(14, 6))
+uf_pivot.plot(kind="bar", stacked=True, figsize=(14, 6))
+plt.xlabel("UF")
+plt.ylabel("Total de Acidentes")
+plt.title("Total de Acidentes por UF e Condição Meteorológica")
+plt.tight_layout()
+
+# %%
+uf_analysis = analyze(df, "uf")
+uf_analysis = uf_analysis.sort_values("taxa_fatalidade_pct", ascending=False)
+
+plt.figure(figsize=(10, 5))
+plt.bar(uf_analysis["uf"], uf_analysis["taxa_fatalidade_pct"], color="red")
+plt.xlabel("UF")
+plt.ylabel("Taxa de fatalidade")
+plt.title("Taxa de fatalidade por UF")
+plt.tight_layout()
+plt.show()
