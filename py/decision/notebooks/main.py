@@ -57,6 +57,20 @@ print(df["acidente_fatal"].value_counts())
 
 # %% [markdown]
 # ### 3. Crie sua hipótese
-# Hipotéses:
+#
+# #### Hipotéses:
 # A maioria dos acidentes ocorre em céu claro
 # O tipo de acidente mais grave é o Atropelamento
+
+
+# %%
+def analyze(df, col):
+    return (
+        df.groupby(col)
+        .agg(
+            total_acidentes=("acidente_fatal", "count"),
+            acidentes_fatais=("acidente_fatal", "sum"),
+            taxa_fatalidade=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
+        )
+        .reset_index()
+    )
