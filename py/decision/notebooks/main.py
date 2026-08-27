@@ -1,4 +1,6 @@
 # %%
+from logging import fatal
+from operator import index
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -57,6 +59,111 @@ print(df["acidente_fatal"].value_counts())
 
 # %% [markdown]
 # ### 3. Crie sua hipótese
-# Hipotéses:
-# A maioria dos acidentes ocorre em céu claro
-# O tipo de acidente mais grave é o Atropelamento
+#
+# #### Hipotéses:
+# A maioria dos acidentes ocorrem a tarde
+# O tipo de acidente mais grave é o atropelamento
+
+# %% [markdown]
+# ### 5. Engenharia de variável
+
+# %%
+df["hora"] = pd.to_datetime(df["horario"], format="%H:%M:%S", errors="coerce").dt.hour
+
+
+# %%
+def def_faixa_horaria(hour):
+    if pd.isna(hour):
+        return "Ignorado"
+    elif 6 <= hour < 12:
+        return "Manhã (6h-12h)"
+    elif 12 <= hour < 18:
+        return "Tarde (12h-18h)"
+    elif 18 <= hour < 24:
+        return "Noite (18h-24h)"
+    else:
+        return "Madrugada (0h-6h)"
+
+
+# %%
+# Nova variável
+df["faixa_horaria"] = df["hora"].apply(def_faixa_horaria)
+
+# %% [markdown]
+# ### Explicação
+#
+# Nova coluna:
+# hora e faixa_horaria
+#
+# Explicação:
+# hora: Criada ao extrair a hora da coluna horario pela função dt.hour
+# faixa_horaria: Agrupa os horário por faixas, feito ao criar uma função que
+# retorna uma string com sua faixa e aplica-a a cada linha.
+#
+# Nova coluna hora existe para o agrupamento em faixas
+
+# %% [markdown]
+# ### 6. Análise da hipotese 1
+
+
+# %%
+def analyze(df, col):
+    return (
+        df.groupby(col)
+        .agg(
+            total_acidentes=("acidente_fatal", "count"),
+            acidentes_fatais=("acidente_fatal", "sum"),
+            taxa_fatalidade=("acidente_fatal", lambda x: round(x.mean() * 100, 2)),
+        )
+        .reset_index()
+    )
+
+
+# %%
+faixa_analysis = analyze(df, "faixa_horaria").sort_values(
+    "faixa_horaria", ascending=False
+)
+
+# %%
+print(faixa_analysis.to_string(index=False))
+
+# %%
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.bar(
+    faixa_analysis["faixa_horaria"], faixa_analysis["total_acidentes"], color="tab:blue"
+)
+ax.set_xlabel("Faixa Horária")
+ax.set_ylabel("Total de Acidentes")
+ax.set_title("Total de Acidentes por Faixa Horária")
+plt.tight_layout()
+plt.show()
+
+# %% [markdown]
+# ### 6. Análise da hipotese 2
+
+# %%
+type_analysis = analyze(df, "tipo_acidente").sort_values(
+    "taxa_fatalidade", ascending=False
+)
+
+# %%
+print(type_analysis.to_string(index=False))
+
+# %%
+fig, ax = plt.subplots(figsize=(9, 6))
+y = np.arange(len(type_analysis))
+ax.barh(y, type_analysis["taxa_fatalidade"], color="tab:red")
+ax.set_yticks(y)
+ax.set_yticklabels(type_analysis["tipo_acidente"])
+ax.set_xlabel("Taxa de Fatalidade (%)")
+ax.set_title("Taxa de Fatalidade por Tipo de Acidente")
+ax.invert_yaxis()
+plt.tight_layout()
+plt.show()
+
+# %% [markdown]
+# ### Interpretação
+#
+# A tarde é a faixa horária com mais acidentes, porém possui a menor taxa de fatalidade.
+# A madrugada é a faixa horária com a maior taxa de acidentes fatais, mesmo
+# possuindo a menor qtd de acidentes e acidentes fatais.
