@@ -172,11 +172,17 @@ plt.show()
 
 # %% [markdown]
 # ### 8. Cruzamento de variáveis
+# tipo_pista x condicao_metereologica
+
 
 # %%
-tipo_condicao_analysis = analyze(df, ["tipo_pista", "condicao_metereologica"])
+tipo_condicao_analysis = (
+    df.groupby(["tipo_pista", "condicao_metereologica"])
+    .agg(
+        acidentes_fatais=("acidente_fatal", "sum"),
+    )
+    .reset_index()
+).sort_values("acidentes_fatais", ascending=False)
 
-tipo_condicao_analysis = tipo_condicao_analysis.sort_values(
-    "total_acidentes", ascending=False
-)
+# %%
 print(tipo_condicao_analysis.to_string(index=False))
