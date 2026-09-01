@@ -61,7 +61,6 @@ print(df["acidente_fatal"].value_counts())
 # ### 3. Crie sua hipótese
 #
 # #### Hipotéses:
-<<<<<<< HEAD
 # A maioria dos acidentes ocorrem a tarde
 # O tipo de acidente mais grave é o atropelamento
 
@@ -120,7 +119,6 @@ def analyze(df, col):
         )
         .reset_index()
     )
-<<<<<<< HEAD
 
 
 # %%
@@ -171,3 +169,14 @@ plt.show()
 # A tarde é a faixa horária com mais acidentes, porém possui a menor taxa de fatalidade.
 # A madrugada é a faixa horária com a maior taxa de acidentes fatais, mesmo
 # possuindo a menor qtd de acidentes e acidentes fatais.
+
+# %% [markdown]
+# ### 8. Cruzamento de variáveis
+
+# %%
+tipo_condicao_analysis = analyze(df, ["tipo_pista", "condicao_metereologica"])
+
+tipo_condicao_analysis = tipo_condicao_analysis.sort_values(
+    "total_acidentes", ascending=False
+)
+print(tipo_condicao_analysis.to_string(index=False))
