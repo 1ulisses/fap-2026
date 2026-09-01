@@ -160,7 +160,6 @@ ax.set_yticklabels(type_analysis["tipo_acidente"])
 ax.set_xlabel("Taxa de Fatalidade (%)")
 ax.set_title("Taxa de Fatalidade por Tipo de Acidente")
 ax.invert_yaxis()
-plt.tight_layout()
 plt.show()
 
 # %% [markdown]
@@ -186,3 +185,50 @@ tipo_condicao_analysis = (
 
 # %%
 print(tipo_condicao_analysis.to_string(index=False))
+
+# %% [markdown]
+# ### 9. Painel de evidências
+
+# %%
+road_analysis = analyze(df, "tipo_pista").sort_values(
+    "total_acidentes", ascending=False
+)
+
+# %%
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.bar(road_analysis["tipo_pista"], road_analysis["total_acidentes"], color="royalblue")
+ax.set_xlabel("Tipo de pista")
+ax.set_ylabel("Total de Acidentes")
+ax.set_title("Total de Acidentes por tipo de pista")
+plt.tight_layout()
+plt.show()
+
+# %%
+road_type_analysis = (
+    df.groupby(["tipo_pista", "tipo_acidente"]).size().reset_index(name="total")
+)
+
+# %%
+road_type_analysis["pct"] = road_type_analysis.groupby("tipo_pista")["total"].transform(
+    lambda x: round(x / x.sum() * 100, 2)
+)
+
+road_type_analysis = road_type_analysis.sort_values(
+    ["tipo_pista", "total"], ascending=[False, False]
+)
+
+# %%
+print(road_type_analysis.to_string(index=False))
+
+# %%
+pivot = road_type_analysis.pivot_table(
+    index="tipo_pista", columns="tipo_acidente", values="total", fill_value=0
+)
+fig, ax = plt.subplots(figsize=(10, 6))
+pivot.plot(kind="bar", stacked=True, ax=ax, colormap="tab20")
+ax.set_xlabel("Tipo de pista")
+ax.set_ylabel("Total de Acidentes")
+ax.set_title("Composição de Tipo de Acidente por Tipo de Pista")
+ax.legend(title="Tipo de Acidente", bbox_to_anchor=(1.05, 1), loc="upper left")
+plt.tight_layout()
+plt.show()
