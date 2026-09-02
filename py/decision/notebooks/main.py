@@ -104,8 +104,7 @@ df["faixa_horaria"] = df["hora"].apply(def_faixa_horaria)
 
 # %% [markdown]
 # ### 6. Análise da hipotese 1
-# A maioria dos acidentes ocorre em céu claro
-# O tipo de acidente mais grave é o Atropelamento
+#
 
 
 # %%
@@ -123,7 +122,7 @@ def analyze(df, col):
 
 # %%
 faixa_analysis = analyze(df, "faixa_horaria").sort_values(
-    "faixa_horaria", ascending=False
+    "total_acidentes", ascending=False
 )
 
 # %%
@@ -232,3 +231,120 @@ ax.set_title("Composição de Tipo de Acidente por Tipo de Pista")
 ax.legend(title="Tipo de Acidente", bbox_to_anchor=(1.05, 1), loc="upper left")
 plt.tight_layout()
 plt.show()
+
+# %% [markdown]
+# ### 10. Anomalia encontrada
+
+# %%
+top10_municipios = df.groupby("municipio").size().nlargest(10).index.tolist()
+df_top10 = df[df["municipio"].isin(top10_municipios)]
+
+municipio_analysis = analyze(df_top10, "municipio").sort_values(
+    "total_acidentes", ascending=False
+)
+
+print(municipio_analysis.to_string(index=False))
+
+# %% [markdown]
+# ### Explicação
+# Brasília possui ambamente a maior taxa de fatalidade e o maior total de acidentes.
+# Isto é incomum para um município de capital, que geralmente tem uma taxa de fatalidade mais baixa e um total de acidentes mais moderado.
+
+# %% [markdown]
+# ### 11. Tentativa de refutar a hipótese
+# O atropelamento de pedestres ainda é o acidente mais grave em relação ao cenário urbano ou rural?
+# Sim: Urbano
+# Não: Rural
+
+# %%
+type_ground_analysis = analyze(df, ["tipo_acidente", "uso_solo"]).sort_values(
+    ["uso_solo", "taxa_fatalidade"], ascending=[False, False]
+)
+
+print(type_ground_analysis.to_string(index=False))
+
+# %% [markdown]
+# ### Explicação
+# O atropelamento de pedestres so é o tipo de acidente mais grave em relação ao cenário rural.
+# No cenário urbano, o acidente mais grave é a colisão com objetos.
+
+# %% [markdown]
+# ### 12. Frequência × Fatalidade
+# Faixa horária
+
+# %%
+print(faixa_analysis.to_string(index=False))
+
+# %%
+faixa_analysis = faixa_analysis.sort_values("acidentes_fatais", ascending=False)
+print(faixa_analysis.to_string(index=False))
+
+# %% [markdown]
+# ### 13. Recomendações
+
+# %% [markdown]
+# ### Recomendação 1
+#
+# #### Evidência
+# Acidentes em pista simples e em área rural (uso_solo = Não) apresentam taxas
+# de fatalidade drasticamente superiores. A colisão frontal em área rural possui
+# 35,13% de taxa de fatalidade (contra 15,65% na área urbana). Além disso, a
+# pista simples concentra 12,20% de colisões frontais, enquanto pistas duplas e
+# múltiplas apresentam apenas cerca de 1,30% a 1,45% desse tipo de acidente.
+#
+# #### Interpretação
+# A ausência de separação física entre fluxos opostos (pista simples) e a falta de
+# infraestrutura de áreas urbanas (como iluminação e proximidade de hospitais)
+# amplificam a gravidade dos eventos. A colisão frontal em alta velocidade em
+# trechos rurais é o principal motor de óbitos, transformando falhas humanas em
+# tragédias.
+#
+# #### Recomendação
+# Priorizar investimentos na duplicação de trechos rurais de pista simples com alto
+# histórico de colisões frontais e saídas de pista. Nos trechos onde a duplicação
+# for financeiramente ou geograficamente inviável a curto prazo, instalar barreiras
+# físicas centrais (como cabos de aço ou barreiras de concreto) para impedir a
+# invasão da pista oposta e melhorar a sinalização refletiva.
+#
+# #### Cuidado
+# A base de dados não informa o Volume Diário Médio (VDM) de veículos nem a
+# velocidade média permitida na via. A duplicação de trechos com baixíssimo fluxo
+# de veículos pode não apresentar um retorno sobre o investimento (ROI) adequado em
+# termos de vidas salvas por milhão de reais investidos.
+
+# %% [markdown]
+# ### Recomendação 2
+#
+# #### Evidência
+# A faixa horária da Madrugada (0h-6h) apresenta a maior taxa de fatalidade (12,10%),
+# seguida pela Noite (9,13%), apesar de concentrarem os menores volumes absolutos
+# de acidentes (8.907 e 20.461, respectivamente, contra mais de 20.000 nos demais
+# períodos).
+#
+# #### Interpretação
+# A alta letalidade noturna indica que os acidentes nesses horários envolvem maior
+# energia cinética (excesso de velocidade em pistas vazias), fadiga, sonolência ou
+# ingestão de álcool. A baixa visibilidade e o menor tempo de reação resultam em
+# impactos mais severos, como saídas de leito carroçável e colisões frontais, em
+# vez de colisões traseiras de baixa velocidade comuns durante o dia.
+#
+# #### Recomendação
+# Realocar o efetivo de fiscalização e as operações de blitz para os períodos
+# noturnos e de madrugada, com foco rigoroso em testes de alcoolemia e combate à
+# fadiga (especialmente para motoristas profissionais de carga). Em paralelo,
+# investigar a instalação de tachões refletivos, sonorizadores e iluminação
+# inteligente em curvas e trechos críticos para mitigar saídas de pista causadas
+# por sonolência.
+#
+# #### Cuidado
+# Os dados não confirmam a causa raiz comportamental (álcool, sono ou velocidade).
+# A alta letalidade noturna pode estar concentrada em um perfil específico (ex:
+# transporte de carga pesada) que exige análise cruzada com a variável de tipo de
+# veículo e laudos de alcoolemia para evitar o desperdício de recursos operacionais
+# em fiscalizações ineficazes.
+
+# %% [markdown]
+# ### 14. Limitações
+
+# %% [markdown]
+# ### 15. Conclusão executiva
