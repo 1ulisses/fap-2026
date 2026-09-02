@@ -164,6 +164,7 @@ plt.show()
 # %% [markdown]
 # ### Interpretação
 #
+# Hipotése 1
 # A tarde é a faixa horária com mais acidentes, porém possui a menor taxa de fatalidade.
 # A madrugada é a faixa horária com a maior taxa de acidentes fatais, mesmo
 # possuindo a menor qtd de acidentes e acidentes fatais.
@@ -180,10 +181,39 @@ tipo_condicao_analysis = (
         acidentes_fatais=("acidente_fatal", "sum"),
     )
     .reset_index()
-).sort_values("acidentes_fatais", ascending=False)
+).sort_values(["tipo_pista", "acidentes_fatais"], ascending=[False, False])
 
 # %%
 print(tipo_condicao_analysis.to_string(index=False))
+
+# %% [markdown]
+# ### Resposta
+#
+# Não, o comportamento não permanece igual. O impacto da condição meteorológica na
+# ocorrência de acidentes fatais muda significativamente dependendo do tipo de pista
+# em que o veículo se encontra. A infraestrutura da via atua modificando o risco
+# associado ao clima.
+#
+# 1. O que a análise isolada mostra:
+#
+# Apenas o Clima: "Céu Claro" domina as estatísticas com 3.419 mortes no total, o
+# que pode levar à falsa conclusão de que o bom tempo é o mais perigoso (na verdade,
+# é apenas o cenário de maior exposição e volume de tráfego).
+# Apenas a Via: A "Pista Simples" concentra a esmagadora maioria das mortes (3.424),
+# seguida pela Dupla (1.501) e Múltipla (285).
+#
+# 2. O que a interação revela:
+#
+# Na Pista Simples, a soma de acidentes fatais sob Chuva, Garoa e Nevoeiro é de 405
+# casos. Na Pista Dupla, são 175 casos. Porém, na Pista Múltipla, esse número despenca
+# para apenas 26 casos. A redução de mortes por clima adverso na pista múltipla é desproporcionalmente
+# maior do que a redução geral de acidentes, provando que vias com mais faixas e separação
+# física neutralizam quase completamente os riscos de aquaplanagem e neblina.
+#
+# Na Pista Simples, as mortes em dias "Nublados" representam 22% do volume de mortes
+# em dias de "Céu Claro" (502 vs 2.272). Na Pista Dupla, sobe para 25% (254 vs 982).
+# Mas na Pista Múltipla, a proporção de mortes em dias nublados salta para quase 45%
+# em relação aos dias de céu claro (74 vs 165).
 
 # %% [markdown]
 # ### 9. Painel de evidências
@@ -217,9 +247,6 @@ road_type_analysis = road_type_analysis.sort_values(
 )
 
 # %%
-print(road_type_analysis.to_string(index=False))
-
-# %%
 pivot = road_type_analysis.pivot_table(
     index="tipo_pista", columns="tipo_acidente", values="total", fill_value=0
 )
@@ -231,6 +258,26 @@ ax.set_title("Composição de Tipo de Acidente por Tipo de Pista")
 ax.legend(title="Tipo de Acidente", bbox_to_anchor=(1.05, 1), loc="upper left")
 plt.tight_layout()
 plt.show()
+
+# %%
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.bar(
+    road_analysis["tipo_pista"], road_analysis["acidentes_fatais"], color="indianred"
+)
+ax.set_xlabel("Tipo de pista")
+ax.set_ylabel("Total de Acidentes Fatais")
+ax.set_title("Total de Acidentes Fatais por tipo de pista")
+plt.tight_layout()
+plt.show()
+
+# %% [markdown]
+# Quando analisamos a infraestrutura das rodovias, descobrimos que o tipo de pista
+# não dita apenas a frequência dos acidentes, mas a probabilidade de sobrevivência
+# dos envolvidos. Pistas simples concentram o maior volume de ocorrências e são o
+# cenário predominante para os tipos de acidentes mais violentos, como colisões
+# frontais. Consequentemente, a ausência de separação física entre os fluxos opostos
+# transforma erros humanos comuns em tragédias, resultando em uma taxa de fatalidade
+# muito superior à das rodovias duplicadas.
 
 # %% [markdown]
 # ### 10. Anomalia encontrada
@@ -344,8 +391,6 @@ print(faixa_analysis.to_string(index=False))
 # em fiscalizações ineficazes.
 
 # %% [markdown]
-# ### 14. Limitações
-#
 # ## Decisão Prioritária: Onde Agir Primeiro
 #
 # ### Resposta Direta
@@ -415,7 +460,45 @@ print(faixa_analysis.to_string(index=False))
 # Esses locais têm alta frequência, mas baixa letalidade.
 # Os acidentes ali são majoritariamente colisões traseiras
 # e laterais de baixo impacto, com taxas de fatalidade abaixo de 4%.
+
+# %% [markdown]
+# ### 14. Limitações
+
+# %% [markdown]
+# #### 1. Ausência de Exposição ao Risco (Volume de Tráfego)
 #
+# A base de dados registra o número absoluto de acidentes, mas não informa o Volume Diário Médio (VDM) de veículos que trafegam por cada trecho, UF ou horário.
+# Impacto: Não é possível calcular a probabilidade real de um veículo se envolver em um acidente. Uma rodovia com 1.000 acidentes e fluxo de 100.000 veículos/dia é estatisticamente mais segura que uma rodovia com 500 acidentes e fluxo de 5.000 veículos/dia. Conclusões sobre "os horários mais perigosos" ou "as UFs mais perigosas" baseiam-se apenas em volume bruto, não em risco relativo.
+#
+# #### 2. Viés de Registro e Escopo da Base
+#
+# Os dados abrangem apenas as rodovias federais (BRs) e, em sua maioria, as ocorrências que tiveram o registro formal da PRF.
+# Impacto: Acidentes sem vítimas (apenas danos materiais) frequentemente não geram boletim de ocorrência da PRF, o que pode superestimar a gravidade média dos eventos na base. Além disso, a análise ignora completamente o cenário das rodovias estaduais e vias municipais. A presença expressiva de categorias como "Ignorado" em variáveis críticas (como causa, clima e condição da via) também reduz a confiabilidade de certas segmentações.
+#
+# #### 3. Impossibilidade de Explicar o Mecanismo Causal (Variáveis Não Observadas)
+#
+# A base registra as circunstâncias do acidente (ex: pista simples, chuva, colisão frontal), mas não captura o comportamento do condutor, as condições mecânicas do veículo ou a infraestrutura exata do trecho.
+# Impacto: Sabemos que a madrugada tem alta letalidade, mas a base não confirma se a causa raiz foi sono, álcool, excesso de velocidade ou falta de iluminação. Sabemos que pista simples é mais letal, mas não sabemos se o fator determinante foi a falta de separação física, a má conservação do asfalto ou o tráfego pesado de caminhões. A análise identifica associações e correlações fortes, mas não consegue isolar a causalidade direta.
+
 # %% [markdown]
 # ### 15. Conclusão executiva
 #
+
+# %% [markdown]
+# ## Conclusão
+# **Problema:** Investigamos padrões de acidentes nas rodovias federais brasileiras para identificar
+# quais combinações de horário, tipo de via e localização estão associadas a maior
+# gravidade.
+# **Principais descobertas:** Volume e fatalidade seguem lógicas distintas. MG, SC e PR concentram mais acidentes,
+# mas MA (18,70%), PA (17,28%) e RR (16,20%) possuem as maiores taxas de letalidade.
+# A madrugada (0h-6h) é o período mais letal, com taxa de 12,10%, quase o triplo da
+# manhã (4,93%). Pistas simples em áreas rurais são drasticamente mais fatais que vias
+# duplicadas em áreas urbanas.
+# **Evidências:** Colisão frontal em área rural apresenta 35,13% de fatalidade (contra 15,65% na urbana).
+# Atropelamento de pedestre rural atinge 40,05%. Pista simples sob céu claro registra
+# 2.272 acidentes fatais, mais que o dobro da pista dupla (982).
+# **Recomendação:** Priorizar fiscalização noturna em trechos rurais de pista simples, com foco em velocidade,
+# fadiga e álcool. Avaliar instalação de barreiras centrais para reduzir colisões frontais.
+# **Limitação:** Os dados mostram associações, não causalidade. Não há informações sobre volume de
+# tráfego, comportamento do condutor, condições da via ou tempo de resposta do socorro,
+# o que impede afirmar os mecanismos exatos por trás dos padrões encontrados.
