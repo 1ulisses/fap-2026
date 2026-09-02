@@ -345,6 +345,77 @@ print(faixa_analysis.to_string(index=False))
 
 # %% [markdown]
 # ### 14. Limitações
-
+#
+# ## Decisão Prioritária: Onde Agir Primeiro
+#
+# ### Resposta Direta
+#
+# Devemos agir primeiro em **trechos rurais de pista simples**,
+# durante o período da **madrugada (0h às 6h)**,
+# focando na prevenção de **colisões frontais** e **atropelamentos de pedestres**.
+#
+# ### Justificativa com Dados
+#
+# **1. Local: Área rural em pista simples**
+#
+# Os dados mostram que a combinação "pista simples + área rural"
+# é a mais letal do nosso dataset:
+# - Colisão frontal em área rural: **35,13% de taxa de fatalidade**
+# - Atropelamento de pedestre em área rural: **40,05% de taxa de fatalidade**
+# Para comparação:
+# - Colisão frontal em área urbana: 15,65% (menos da metade)
+# - Atropelamento em área urbana: 22,35%
+# Pista simples concentra 12,20% de colisões frontais,
+# enquanto pista dupla tem apenas 1,30%.
+# A ausência de separação física entre fluxos opostos
+# é o principal fator estrutural de letalidade.
+#
+# **2. Período: Madrugada e Noite**
+#
+# - Madrugada (0h-6h): **12,10% de taxa de fatalidade**
+# - Noite (18h-24h): **9,13% de taxa de fatalidade**
+# - Tarde (12h-18h): 5,53%
+# - Manhã (6h-12h): 4,93%
+# A madrugada tem o menor volume de acidentes (8.907),
+# mas a maior proporção de mortes.
+# Isso indica alta velocidade, fadiga e menor tempo de resposta ao socorro.
+#
+# **3. Característica do acidente: Colisão frontal e atropelamento**
+#
+# São os dois tipos com maior energia de impacto
+# e menor chance de sobrevivência:
+#
+# | Tipo | Rural | Urbano |
+# |------|-------|--------|
+# | Colisão frontal | 35,13% | 15,65% |
+# | Atropelamento de pedestre | 40,05% | 22,35% |
+#
+# **4. Gravidade: Foco na taxa, não no volume**
+#
+# Os municípios com mais acidentes (Brasília, Duque de Caxias, São José)
+# têm taxas de fatalidade baixas (1,45% a 4,25%).
+# Os estados com maior taxa de fatalidade (MA: 18,70%, PA: 17,28%)
+# têm menor volume absoluto.
+# A prioridade deve ser reduzir a **probabilidade de morte por acidente**,
+# não apenas reduzir o número total de ocorrências.
+#
+# ### Plano de Ação Sugerido
+#
+# | Prioridade | Ação | Justificativa |
+# |---|---|---|
+# | 1ª | Fiscalização noturna em trechos rurais de pista simples | Madrugada + pista simples = maior taxa de fatalidade |
+# | 2ª | Instalação de barreiras centrais em trechos críticos | Reduz colisões frontais (35% de fatalidade rural) |
+# | 3ª | Sinalização e iluminação em pontos de atropelamento rural | Atropelamento rural tem 40% de fatalidade |
+# | 4ª | Campanhas contra fadiga e álcool na madrugada | Horário com maior letalidade e menor volume |
+#
+# ### O que NÃO fazer
+#
+# Não priorizar ações apenas nos municípios com maior volume
+# de acidentes (Brasília, Duque de Caxias, Guarulhos).
+# Esses locais têm alta frequência, mas baixa letalidade.
+# Os acidentes ali são majoritariamente colisões traseiras
+# e laterais de baixo impacto, com taxas de fatalidade abaixo de 4%.
+#
 # %% [markdown]
 # ### 15. Conclusão executiva
+#
