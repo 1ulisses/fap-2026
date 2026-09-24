@@ -189,7 +189,54 @@ clima_analysis
 # 9. Análises bivariadas selecionadas
 
 # %% [markdown]
+# condicao_metereologica x faixa_horaria
+#
+# Escolhemos combinar condicao_metereologica e faixa horária porque o efeito do clima
+# sobre a gravidade não deve ser uniforme ao longo do dia. A faixa horária funciona como
+# proxy de luz natural, fluxo de veículos e fadiga do condutor. Por isso, contextos como
+# chuva à noite ou neblina na madrugada podem concentrar risco maior do que cada fator
+# analisado isoladamente.
+# O volume analisado deve considerar apenas combinações com número mínimo de acidentes, por
+# exemplo 30 ou 100 registros, para evitar taxas instáveis. O indicador de gravidade será a
+# taxa de acidentes fatais, calculada como acidentes fatais divididos pelo total de
+# acidentes, além de mortos por acidente como métrica complementar.
+# A comparação será feita contra a taxa global da base e contra as taxas marginais de clima
+# e horário. Se uma combinação apresentar taxa acima da referência e volume suficiente, ela
+# será interpretada como contexto crítico. Se apresentar taxa alta, mas volume baixo, será
+# tratada como evidência frágil.
+# A principal limitação é que células com poucos acidentes podem gerar proporções enganosas.
+# Além disso, a faixa horária não mede diretamente visibilidade, sono ou tráfego, servindo
+# apenas como aproximação desses fatores.
+
+# %% [markdown]
 # 10. Investigação de combinações
+
+# %%
+df["hora"] = pd.to_datetime(df["horario"], format="%H:%M:%S", errors="coerce").dt.hour
+
+
+# %%
+def def_faixa_horaria(hour):
+    if pd.isna(hour):
+        return "Ignorado"
+    elif 6 <= hour < 12:
+        return "Manhã (6h-12h)"
+    elif 12 <= hour < 18:
+        return "Tarde (12h-18h)"
+    elif 18 <= hour < 24:
+        return "Noite (18h-24h)"
+    else:
+        return "Madrugada (0h-6h)"
+
+
+# %%
+df["faixa_horaria"] = df["hora"].apply(def_faixa_horaria)
+
+# %%
+faixa_clima = analyze(df, ["condicao_metereologica", "faixa_horaria"]).sort_values(
+    "total_acidentes", ascending=False
+)
+faixa_clima
 
 # %% [markdown]
 # 11. Teste dos achados
