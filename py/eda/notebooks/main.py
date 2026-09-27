@@ -44,8 +44,6 @@ df = pd.read_csv(RAW_FILE, sep=";", encoding="latin1", low_memory=False)
 # climáticas.
 # - A letalidade em condições adversas (chuva/neblina) à noite é desproporcionalmente
 # maior do que durante o dia sob o mesmo clima.
-# - Acidentes por saída de pista e capotamento são estatisticamente mais frequentes
-# em pistas secas do que em pistas molhadas.
 
 # %% [markdown]
 # 4. Estratégia de investigação
@@ -90,6 +88,9 @@ unique.head(15)
 # 6. Linha de base
 
 # %%
+df["acidente_fatal"] = np.where(df["mortos"] >= 1, 1, 0)
+
+# %%
 # Total de acidentes
 print(df.shape[0])
 
@@ -116,9 +117,6 @@ print(df["mortos"].sum() / (df["feridos"].sum() + df["mortos"].sum()) * 100)
 # %% [markdown]
 # 7. Exploração inicial
 #
-
-# %%
-df["acidente_fatal"] = np.where(df["mortos"] >= 1, 1, 0)
 
 
 # %%
@@ -233,25 +231,83 @@ def def_faixa_horaria(hour):
 df["faixa_horaria"] = df["hora"].apply(def_faixa_horaria)
 
 # %%
-faixa_clima = analyze(df, ["condicao_metereologica", "faixa_horaria"]).sort_values(
-    "total_acidentes", ascending=False
-)
-faixa_clima
+faixa_clima_analysis = analyze(
+    df, ["condicao_metereologica", "faixa_horaria"]
+).sort_values("total_acidentes", ascending=False)
+faixa_clima_analysis
 
 # %% [markdown]
 # 11. Teste dos achados
 
 # %% [markdown]
+# # Achado
+# A análise revela que a Madrugada (0h-6h) atua como um multiplicador
+# universal de letalidade, alterando drasticamente o comportamento de todas as condições
+# climáticas.
+# Sob Céu Claro, a taxa de fatalidade salta de aproximadamente 5% durante o dia para 12,46%
+# na madrugada, com alto volume de acidentes (5.498). Esse salto proporcional se repete
+# em dias Nublados (de 4,7% para 12,75%) e sob Chuva (de 4,7% para 9,25%). A madrugada
+# invariavelmente dobra ou triplica a taxa de óbitos em relação ao período diurno,
+# independentemente do clima.
+# A combinação com a maior taxa absoluta é **Nevoeiro + Noite (18,18%)**, porém possui
+# volume baixo (99 acidentes), o que exige cautela para não superestimar o risco
+# populacional. Já o contexto **Céu Claro + Madrugada** é o mais crítico em impacto
+# absoluto e estabilidade estatística (685 mortes em 5.498 acidentes).
+# A conclusão analítica é que a ausência de luz natural e a provável fadiga do condutor na
+# madrugada agravam a severidade dos acidentes de forma muito mais agressiva do que a
+# condição meteorológica isolada. O clima define a frequência, mas a faixa horária define
+# a letalidade.
+#
+# # Explicação alternativa
+# A madrugada concentra acidentes de alta letalidade intrínseca, como "Colisão Frontal" e
+# "Saída de Pista", causados por cochilos ao volante.
+
+# %%
+faixas = ["Manhã (6h-12h)", "Madrugada (0h-6h)"]
+sub_df = df.query("faixa_horaria in @faixas and tipo_acidente == 'Colisï¿½o traseira'")
+
+faixa_tipo_analysis = analyze(sub_df, ["tipo_acidente", "faixa_horaria"]).sort_values(
+    "total_acidentes", ascending=False
+)
+faixa_tipo_analysis
+
+# %% [markdown]
+# Mesmo isolando apenas a "Colisão Traseira", a taxa de fatalidade na madrugada (9,84%)
+# foi quatro vezes superior à da manhã (2,40%). Isso prova que a madrugada não é letal
+# apenas por concentrar acidentes graves, como colisões frontais; ela agrava a severidade
+# de qualquer ocorrência.
+
+# %% [markdown]
 # 12. Anomalias e limitações
 
 # %% [markdown]
-# 13. Três principais descobertas
+# O padrão central desta análise é a letalidade desproporcional na madrugada, validada por
+# alto volume de registros e consistência em múltiplos recortes, como clima e tipos de
+# acidente. A anomalia identificada é a taxa de fatalidade de 18,18% sob neblina noturna,
+# que deve ser tratada com ceticismo por se basear em apenas 99 ocorrências,
+# caracterizando uma flutuação amostral e não uma regra estatística. A distinção entre
+# ambos se dá pelo volume e pela repetição: o padrão da madrugada se mantém robusto em
+# milhares de casos, enquanto a anomalia da neblina é um evento raro e instável. A
+# principal limitação desta etapa é a ausência de dados sobre a velocidade dos veículos no
+# impacto e o tempo de resposta do socorro médico, o que nos impede de concluir se a
+# gravidade noturna decorre da física de colisões em tráfego livre ou do atraso no resgate
+# das vítimas.
 
-# %% [markdown]
-# 14. Hipóteses geradas
-
-# %% [markdown]
-# 15. Próximas investigações
 
 # %% [markdown]
 # 16. Conclusão
+
+# %% [markdown]
+# A investigação seguiu um encadeamento lógico em que a definição da pergunta central e
+# das hipóteses norteou uma estratégia de análise estruturada, partindo do saneamento e
+# validação da base até o estabelecimento das métricas globais de referência; a partir
+# daí, a exploração univariada revelou a distribuição geral dos acidentes, conduzindo às
+# análises bivariadas e à combinação de variáveis (clima e faixa horária), onde emergiu o
+# papel crítico da madrugada, o qual foi subsequentemente testado e validado contra
+# explicações alternativas (isolando tipos específicos de sinistro, como colisão
+# traseira) e confrontado com suas anomalias e limitações amostrais. Com essa trajetória,
+# a pergunta central foi plenamente respondida: as condições meteorológicas adversas
+# influenciam primordialmente a probabilidade e o volume de ocorrência dos acidentes, mas
+# não alteram fundamentalmente o seu perfil intrínseco de gravidade e letalidade — papel
+# este exercido com muito mais força pelo fator temporal (madrugada) e comportamental
+# do que pelo clima em si.
