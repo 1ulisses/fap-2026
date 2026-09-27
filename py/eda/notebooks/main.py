@@ -293,9 +293,24 @@ faixa_tipo_analysis
 # gravidade noturna decorre da física de colisões em tráfego livre ou do atraso no resgate
 # das vítimas.
 
+# %% [markdown]
+# 13. Três principais descobertas
 
 # %% [markdown]
-# 16. Conclusão
+# 14. Conclusão
+
+# O céu claro é proporcionalmente mais letal que a chuva, pois o tempo bom incentiva o
+# excesso de velocidade, enquanto o mau tempo força o motorista a adotar um comportamento
+# defensivo e compensatório. Segundo, identificamos a madrugada como um multiplicador
+# universal de letalidade, um contexto crítico que agrava a severidade de qualquer
+# ocorrência e eleva drasticamente a taxa de óbitos em todas as condições meteorológicas.
+# Terceiro, através de testes de robustez, provamos que essa periculosidade noturna é
+# intrínseca ao horário — muito provavelmente ditada por tráfego livre em alta velocidade
+# ou atraso no socorro médico — e não um simples viés de composição, pois até mesmo
+# acidentes tipicamente leves, como colisões traseiras, tornam-se altamente fatais nesse
+# período. Essas conclusões só possuem validade estatística porque priorizamos o
+# saneamento da base, isolando o viés de aferição da categoria "Ignorado" e descartando o
+# ruído de eventos raros.
 
 # %% [markdown]
 # A investigação seguiu um encadeamento lógico em que a definição da pergunta central e
