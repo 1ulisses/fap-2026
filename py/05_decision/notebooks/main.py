@@ -1,6 +1,4 @@
 # %%
-from logging import fatal
-from operator import index
 from pathlib import Path
 
 import matplotlib.pyplot as plt
