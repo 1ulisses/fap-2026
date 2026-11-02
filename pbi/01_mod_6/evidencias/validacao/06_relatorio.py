@@ -5,9 +5,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-ANALYTICAL_FILE = Path(__file__).parent.parent / "modelo_dados/acidentes2025.csv"
+ANALYTICAL_FILE = Path("../modelo_dados/acidentes2025.csv")
 df = pd.read_csv(ANALYTICAL_FILE, sep=",", encoding="utf-8", low_memory=False)
 
+# %%
+df.dtypes
 # %%
 # Total de acidentes
 len(df.index)
